@@ -1,0 +1,441 @@
+<%- include('header') %>
+<%- include('menu') %>
+
+<div class="content-container">
+    <!-- Upper Section: Report Generation and PDF Viewer -->
+     <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card card-custom">
+                    <h4>Generate Crop Report</h4><br>
+                    <div>
+                        <button class="agri-button-main" id="generate-report-btn">Generate Report</button>
+
+                    </div><br>
+                    <div id="report-history-table"></div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="card card-custom">
+                    <h4>PDF Viewer</h4>
+                    <!-- Embed PDF Viewer -->
+                    <iframe id="pdf-viewer" src="file/Corn_report.pdf" width="100%" height="400px"></iframe>
+                    <div class="text-center">
+                        <button id="download-pdf" class="btn btn-success mt-2">Download PDF</button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <!-- Lower Section: Crop Details and Graphs -->
+        <div class="row mt-5">
+            <div class="col-md-4">
+                <div class="card card-custom">
+                    <h4>Crop Data</h4>
+                    <div id="crop-table"></div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="card card-custom">
+                    <h4>Crop Analytics</h4>
+                    <div class="charts-container">
+                        <canvas id="cropHealthChart"     height="100"> </canvas>
+                        <canvas id="cropQuantityChart"   height="100"></canvas>
+                        <canvas id="marketDemandChart"   height="100"></canvas>
+                        <canvas id="performanceBarChart" height="100"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+ <!-- Modal for Generating Report -->
+<div id="generateReportModal" class="modal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="dailyReport" data-bs-toggle="modal" data-bs-target="#daily-report-modal">Generate Report Report</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <!-- <h4>Generate Report</h4> -->
+            <div class="modal-body">
+                <label for="cropSelection">Select Crops:</label>
+                <select id="cropSelection" class="form-control" multiple>
+                    <!-- Options will be dynamically generated -->
+                </select>
+                <!-- Add other inputs if necessary -->
+            </div>
+       
+            
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="submit-report-btn">Submit</button>
+            </div>
+        </div>
+    
+    </div>
+</div>
+    
+</div>
+
+     
+    <script>
+        const crops = [
+    { id: 1, name: 'Wheat' },
+    { id: 2, name: 'Corn' },
+    { id: 3, name: 'Tomato' },
+    { id: 4, name: 'Watermelon' },
+    { id: 5, name: 'Green Onion' }
+];
+
+        const reportHistory = [
+            { id: 1, name: "Crop Health Report 1", date_generated: "2024-09-01" },
+            { id: 2, name: "Crop Yield Report", date_generated: "2024-09-10" }
+        ];
+
+        const reportHistoryTable = new Tabulator("#report-history-table", {
+            data: reportHistory,
+            layout: "fitColumns",
+            columns: [
+                { title: "Report Name", field: "name", sorter: "string" },
+                { title: "Date Generated", field: "date_generated", sorter: "date" },
+                { formatter: function() {
+                return '<i class="fas fa-download" style="cursor:pointer;"></i>'; // Use Font Awesome download icon
+            }, width: 40, align: "center", cellClick: function(e, cell) {
+                const reportData = cell.getRow().getData();
+                downloadReport(reportData.name); // Call the download function with report name
+            }}
+            ],
+            rowClick: function(e, row){
+                
+            document.getElementById('pdf-viewer').src = `/file/Tomato_report.pdf`;
+            }
+        });
+
+        // Sample download function
+function downloadReport(reportName) {
+    // You can modify the path according to your file structure
+    const filePath = `/file/Tomato_report.pdf`;
+
+    // Trigger the download
+    const link = document.createElement('a');
+    link.href = filePath;  // This should point to the file path
+    link.download = `${reportName}.pdf`; // Set the file name for the download
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link); // Remove the link after downloading
+}
+
+        const tableData = [
+    {id: 1, crop_cd:"001", crop_name: "Wheat", planted_on: "2024-03-01", harvest_due: "2024-10-22", status: "Good", estimate_amount:"100kg", profit_margin:"65%", action_num: 3},
+    {id: 2, crop_cd:"002", crop_name: "Corn", planted_on: "2024-05-12", harvest_due: "2024-11-30", status: "Average", estimate_amount:"130kg", profit_margin:"70%" , action_num: 2},
+    {id: 3, crop_cd:"003", crop_name: "Tomato", planted_on: "2024-06-15", harvest_due: "2024-09-25", status: "Very Good", estimate_amount:"90kg", profit_margin:"65%", action_num: 1},
+    {id: 4, crop_cd:"004", crop_name: "Watermelon", planted_on: "2024-07-15", harvest_due: "2024-10-25", status: "Very Good", estimate_amount: "60kg", profit_margin:"60%", action_num: 0},
+    {id: 5, crop_cd:"005", crop_name: "Green Onion", planted_on: "2024-06-15", harvest_due: "2024-09-25", status: "Low", estimate_amount:"60kg", profit_margin:"20%", action_num: 6}
+];
+
+
+        
+        const table = new Tabulator("#crop-table", {
+            data: tableData, // Load the dummy data
+    layout: "fitColumns", // Fit columns to width
+    columns: [
+        {title: "Crop Name", field: "crop_name", width: 170}, 
+        {title: "Planted On", field: "planted_on", width: 150}, 
+        {title: "Status", field: "status", width: 110},
+        {title: "Estimation", field: "estimate_amount", width: 170},
+        {title: "Profit Margin", field: "profit_margin", width: 170},
+    ],
+    rowClick: function (e, row) {
+                // On row click, redirect to Crop Detail page (for now just a console log)
+                const cropId = row.getData().id;
+
+        updateGraphs(cropId);
+
+            }
+});
+
+const cropSelect = document.getElementById('cropSelection');
+crops.forEach(crop => {
+    const option = document.createElement('option');
+    option.value = crop.id;
+    option.text = crop.name;
+    cropSelect.appendChild(option);
+});
+
+// Function to submit the report and add a row to the report history table
+document.getElementById('submit-report-btn').addEventListener('click', function() {
+    const selectedOptions = Array.from(cropSelect.selectedOptions);
+    const selectedCrops = selectedOptions.map(option => option.text).join(', ');
+    const currentDate = new Date().toISOString().split('T')[0]; // Get the current date in YYYY-MM-DD format
+    
+    if (selectedCrops) {
+        reportHistoryTable.addRow({ id: reportHistory.length + 1, name: selectedCrops + " Report", date_generated: currentDate });
+        document.getElementById('generateReportModal').style.display = 'none'; // Close the modal
+        cropSelect.value = ''; // Clear selection after submission
+    } else {
+        alert("Please select at least one crop.");
+    }
+});
+        // document.getElementById("generate-report-btn").addEventListener("click", () => {
+        //     const reportModal = new bootstrap.Modal(document.getElementById('reportModal'));
+        //     reportModal.show();
+        // });
+
+        // Function to open the modal
+document.getElementById('generate-report-btn').addEventListener('click', function() {
+    document.getElementById('generateReportModal').style.display = 'block';
+});
+
+// Function to close the modal (You can add more logic for modal closing)
+window.onclick = function(event) {
+    const modal = document.getElementById('generateReportModal');
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+};
+
+
+          // Dummy PDF data for prototyping
+    const pdfData = {
+        1: 'path-to-pdf1.pdf',
+        2: 'path-to-pdf2.pdf',
+    };
+
+
+    document.getElementById('download-pdf').addEventListener('click', function() {
+        const currentPdf = document.getElementById('pdf-viewer').src;
+        window.open(currentPdf, '_blank'); // Trigger download
+    });
+
+   
+    // Global chart instances
+let cropHealthChart = null;
+let cropQuantityChart = null;
+let marketDemandChart = null;
+let performanceBarChart = null;
+
+const cropData = {
+    "1": {
+        health: {
+            actual: [1, 2, 2.5, 3, 3.5, 4, 4.2, 4.8, 5.3, 5.9, 6.5, 7],
+            expected: [1, 1.5, 2.5, 3.5, 4.5, 4.5, 5.5, 6.5, 7.5, 7.5, 7.5, 8.5]
+        },
+        quantity: {
+            actual: [100, 110, 120, 120, 120, 120, 130, 120, 100, 110, 120, 130],
+            expected: [110, 110, 120, 120, 110, 110, 120, 120, 130, 130, 120, 130]
+        },
+        marketDemand: [140, 160, 110, 120, 130, 120, 100, 120, 140, 150, 140, 130],
+        performanceInsight: [72, 68, 76] // Yield, Profit Margin, Growth Rate
+    },
+    "2": {
+        health: {
+            actual: [1, 2, 2.8, 3.3, 3.7, 4.1, 3.8, 4.4, 4.9, 5.1, 5.3, 5.5],
+            expected: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+        },
+        quantity: {
+            actual: [90, 110, 130, 120, 160, 180, 150, 180, 220, 200, 240, 270],
+            expected: [100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 320]
+        },
+        marketDemand: [120, 130, 150, 170, 190, 200, 180, 220, 230, 250, 270, 280],
+        performanceInsight: [68, 71, 74] // Yield, Profit Margin, Growth Rate
+    },
+    "3": {
+        health: {
+            actual: [1, 1.5, 2, 2.5, 3, 3.2, 4, 3.7, 4.3, 4.9, 5.1, 5.8],
+            expected: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+        },
+        quantity: {
+            actual: [70, 80, 90, 100, 105, 120, 115, 130, 140, 160, 165, 180],
+            expected: [80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190]
+        },
+        marketDemand: [60, 65, 75, 80, 95, 80, 70, 90, 95, 100, 90, 110],
+        performanceInsight: [85, 75, 80] // Yield, Profit Margin, Growth Rate
+    },
+    "4": {
+        health: {
+            actual: [1, 1.2, 1.6, 2.1, 2.4, 2.9, 3.2, 3.6, 4.1, 4.5, 4.8, 5],
+            expected: [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5]
+        },
+        quantity: {
+            actual: [60, 65, 80, 90, 70, 100, 115, 130, 140, 150, 160, 170],
+            expected: [70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180]
+        },
+        marketDemand: [90, 95, 100, 105, 110, 120, 130, 140, 150, 160, 170, 180],
+        performanceInsight: [83, 78, 81] // Yield, Profit Margin, Growth Rate
+    },
+    "5": {
+        health: {
+            actual: [0.8, 1, 1.3, 1.8, 2.3, 2.7, 3, 3.5, 4, 4.2, 4.3, 4.6],
+            expected: [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5]
+        },
+        quantity: {
+            actual: [40, 45, 50, 60, 65, 70, 75, 90, 95, 100, 105, 110],
+            expected: [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160]
+        },
+        marketDemand: [70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180],
+        performanceInsight: [63, 55, 68] // Yield, Profit Margin, Growth Rate
+    }
+};
+
+
+// Function to update graphs
+function updateGraphs(cropId) {
+    const data = cropData[cropId];
+
+    // Destroy existing chart instances if they exist
+    if (cropHealthChart) cropHealthChart.destroy();
+    if (cropQuantityChart) cropQuantityChart.destroy();
+    if (marketDemandChart) marketDemandChart.destroy();
+    if (performanceBarChart) performanceBarChart.destroy();
+
+    // Create new Line Chart for Crop Health
+    cropHealthChart = new Chart(document.getElementById('cropHealthChart').getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            datasets: [
+                {
+                    label: 'Actual Health',
+                    data: data.health.actual,
+                    borderColor: '#2f5b31',
+                    fill: false
+                },
+                {
+                    label: 'Expected Health',
+                    data: data.health.expected,
+                    borderColor: '#4d950e',
+                    fill: false
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            title: {
+                display: true,
+                text: 'Crop Health Over Time'
+            }
+        }
+    });
+
+    // Create new Line Chart for Crop Quantity Prediction
+    cropQuantityChart = new Chart(document.getElementById('cropQuantityChart').getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            datasets: [
+                {
+                    label: 'Actual Quantity',
+                    data: data.quantity.actual,
+                    borderColor: '#2f5b31',
+                    fill: false
+                },
+                {
+                    label: 'Expected Quantity',
+                    data: data.quantity.expected,
+                    borderColor: '#4d950e',
+                    fill: false
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            title: {
+                display: true,
+                text: 'Crop Quantity Prediction'
+            }
+        }
+    });
+
+    // Create new Line Chart for Market Demand
+    marketDemandChart = new Chart(document.getElementById('marketDemandChart').getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            datasets: [
+                {
+                    label: 'Market Demand',
+                    data: data.marketDemand,
+                    borderColor: '#ffcc00',
+                    fill: false
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            title: {
+                display: true,
+                text: 'Market Demand Over Time'
+            }
+        }
+    });
+
+    // Create new Bar Chart for Crop Performance Insight
+    performanceBarChart = new Chart(document.getElementById('performanceBarChart').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: ['Yield', 'Profit Margin', 'Growth Rate'],
+            datasets: [
+                {
+                    label: 'Performance Insight',
+                    data: data.performanceInsight,
+                    backgroundColor: ['#2f5b31', '#4d950e', '#ffcc00']
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            title: {
+                display: true,
+                text: 'Crop Performance Insights'
+            }
+        }
+    });
+}
+
+
+    </script>
+
+
+
+<script>
+    // Chatbox for modal logic
+    document.getElementById('general-modal-send-chat-btn').addEventListener('click', () => {
+        const chatInput = document.getElementById('modal-chat-input').value;
+        const chatBox = document.getElementById('modal-chat-box');
+
+        // Display user input in chatbox
+        chatBox.innerHTML += `<p><strong>You:</strong> ${chatInput}</p>`;
+
+        // Process the input to check if it contains 'set reminder'
+        const reminderPattern = /set reminder for (.+)/i;  // Regex to capture the reminder text
+        const reminderMatch = chatInput.match(reminderPattern);
+
+        if (reminderMatch) {
+            const reminderText = reminderMatch[1];  // Extract the 'something' part
+
+            // // Add reminder to dashboard
+            // addReminderToDashboard(reminderText);
+
+            setTimeout(() => {
+                chatBox.innerHTML += `<p><strong>AI:</strong> Reminder set for "${reminderText}"!</p>`;
+                chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to bottom
+            }, 1000);
+
+        } else {
+            // Default AI response if no 'set reminder' is found
+            setTimeout(() => {
+                chatBox.innerHTML += `<p><strong>AI:</strong> Here's some advice for your crop!</p>`;
+                chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to bottom
+            }, 1000);
+        }
+
+        // Clear input
+        document.getElementById('modal-chat-input').value = '';
+    });
+
+</script>
+</div>
+

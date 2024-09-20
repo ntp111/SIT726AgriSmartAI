@@ -1,0 +1,611 @@
+<%- include('header') %>
+    <%- include('menu') %>
+
+        <div class="content-container" style="margin-left: 60px; padding: 20px;">
+            <div class="container detail-container">
+                <div class="row">
+                    <div class="col-10">
+                        <h3 class="">Crop Detail</h3><br>
+                    </div>
+                    <div class="col-2" style="text-align: right;">
+                        <button class="agri-button-main" id="update_btn"><i class="fas fa-edit"
+                                style="display: none;"></i>&nbsp;Save</button>
+                        <button class="agri-button-main" id="edit_btn"><i class="fas fa-edit"></i>&nbsp;Edit</button>
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <div class="col-md-7">
+                        <div class="container">
+                            <div class="row">
+                                <div class="card card-custom">
+                                    <h4>Crop Information</h4><br>
+                                    <div class="row">
+                                        <div class="form-group col-2">
+                                            <label for="crop_name">Code</label>
+                                            <input type="text" class="form-control" id="crop_name"
+                                                value="<%= crop.cd || '' %>" disabled>
+                                        </div>
+                                        <div class="form-group col-5">
+                                            <label for="crop_name">Name</label>
+                                            <input type="text" class="form-control" id="crop_name"
+                                                value="<%= crop.name || '' %>" disabled>
+                                        </div>
+                                        <div class="form-group col-5">
+                                            <label for="crop_name">Status</label>
+                                            <input type="text" class="form-control" id="crop_name"
+                                                value="<%= crop.status || ''  %>" readonly disabled>
+                                        </div>
+                                    </div><br>
+                                    <div class="row">
+                                        <div class="form-group col-3">
+                                            <label for="planted_date">Planted on</label>
+                                            <input type="date" class="form-control" id="planted_date"
+                                                value="<%= crop.planted_on || ''  %>" disabled>
+                                        </div>
+                                        <div class="form-group col-3">
+                                            <label for="harvest_date">Harvest Due</label>
+                                            <input type="date" class="form-control" id="harvest_date"
+                                                value="<%= crop.harvest_due || ''  %>" disabled>
+                                        </div>
+                                        <div class="form-group col-3">
+                                            <label for="money">Yield Estimation</label>
+                                            <input type="text" class="form-control" id="money" value="100kg" disabled>
+                                        </div>
+                                        <div class="form-group col-3">
+                                            <label for="money">Profit Margin</label>
+                                            <input type="text" class="form-control" id="money" value="60%" disabled>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><br>
+
+                            <div class="row">
+                                <div class="card card-custom">
+                                    <h4>Crop Diary</h4><br>
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <button class="agri-button-main" id="add-row"><i
+                                                    class="fas fa-plus"></i>
+                                                &nbsp;Add Row</button><br><br>
+                                            <div id="crop-diary-table"></div>
+                                            <br>
+                                        </div>
+                                    </div>
+                                    <br>
+
+                                    <h4>Crop Performance</h4><br>
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div id="crop-performance-table"></div>
+                                            <br>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-5">
+                        <div class="container">
+                            <div class="row">
+                                <div class="card card-custom">
+                                    <h4>IoT Data Statistics</h4><br>
+                                    <!-- <div class="row">
+                                        <div class="col-12">
+                                            <p id="temperature">Temperature: --</p>
+                                            <p id="humidity">Humidity: --</p>
+                                            <p id="soil-moisture">Soil Moisture: --</p>
+
+                                        </div>
+                                    </div>
+                                    <br> -->
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <p id="temperature">Temperature: --</p>
+
+                                            <!-- Humidity Progress Bar -->
+                                            <p>Humidity:</p>
+                                            <div class="progress-bar-container">
+                                                <div class="progress-bar" id="humidity-bar" style="width: 0%;"></div>
+                                            </div>
+
+                                            <!-- Soil Moisture Progress Bar -->
+                                            <p>Soil Moisture:</p>
+                                            <div class="progress-bar-container">
+                                                <div class="progress-bar" id="soil-moisture-bar" style="width: 0%;">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div><br>
+                                </div>
+                            </div><br>
+
+
+                            <div class="row">
+                                <div class="card card-custom">
+                                    <h4>Crop Other Information</h4><br>
+                                    <div class="row">
+                                        <div class="form-group col-6">
+                                            <label for="soilType">Soil Type</label>
+                                            <input type="text" id="soilType" class="form-control" value="Loamy"
+                                                disabled>
+                                        </div>
+                                        <div class="form-group col-6">
+                                            <label for="waterRequirements">Water Requirements</label>
+                                            <input type="text" id="waterRequirements" class="form-control"
+                                                value="Moderate" disabled>
+                                        </div>
+
+                                    </div><br>
+                                    <div class="row">
+                                        <div class="form-group col-6">
+                                            <label for="fertilizerType">Fertilizer Type</label>
+                                            <input type="text" id="fertilizerType" class="form-control" value="Organic"
+                                                disabled>
+                                        </div>
+                                        <div class="form-group col-6">
+                                            <label for="pesticidesApplied">Pesticides Applied</label>
+                                            <input type="text" id="pesticidesApplied" class="form-control" value="None"
+                                                disabled>
+                                        </div>
+
+                                    </div><br>
+                                    <div class="row">
+                                        <div class="form-group col-6">
+                                            <label for="weatherConditions">Weather Conditions</label>
+                                            <input type="text" id="weatherConditions" class="form-control" value="Sunny"
+                                                disabled>
+                                        </div>
+                                        <div class="form-group col-6">
+                                            <label for="growthStage">Growth Stage</label>
+                                            <input type="text" id="growthStage" class="form-control" value="Maturity"
+                                                disabled>
+                                        </div>
+                                    </div><br>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="row">
+                                <div class="card card-custom">
+                                    <div style="display: flex; flex-direction: row; justify-content: space-between;">
+                                        <h4>Performance Tracking</h4> <button class="agri-button-main"
+                                            id="daily-report-btn"><i class="fas fa-file-alt"></i>&nbsp;Daily
+                                            Report</button>
+                                    </div>
+
+                                    <br>
+
+
+                                    <div class="row">
+                                        <div class="form-group col-12">
+                                            <label for="soilType">Crop Health</label>
+                                            <input type="text" id="soilType" class="form-control" value="Good" disabled>
+                                        </div>
+                                    </div><br>
+                                    <div class="row">
+                                        <div class="form-group col-6">
+                                            <label for="fertilizerType">Total Cost</label>
+                                            <input type="text" id="total_cost" class="form-control" value="$5000"
+                                                disabled>
+                                        </div>
+                                        <div class="form-group col-6">
+                                            <label for="pesticidesApplied">Total Revenue</label>
+                                            <input type="text" id="pesticidesApplied" class="form-control" value="$0"
+                                                disabled>
+                                        </div>
+                                    </div><br>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div><br>
+                <% if (crop.name !="" ) { %>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="card card-custom">
+                                        <h4>AI Assistant</h4>
+                                        <div class="chat-container" id="chat-box">
+                                            <p><strong>AI:</strong> I can assist you with queries about <%= crop.name
+                                                    || '' %>
+                                            </p>
+                                        </div>
+                                        <div class="input-group mt-2"
+                                            style="display: flex; flex-direction: row; justify-content: space-between;">
+                                            <input type="text" style="width: 95%;" id="chat-input"
+                                                placeholder="Type a message...">
+                                            <button class="agri-button-main" id="send-chat-btn">Send</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <% } %>
+
+                        <br>
+
+            </div>
+
+
+
+
+            <!-- Modal for Daily Report -->
+            <div id="daily-report-modal" class="modal" aria-labelledby="dailyReport" >
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="dailyReport" data-bs-toggle="modal" data-bs-target="#daily-report-modal">Submit Daily Report</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <!-- <span class="close">&times;</span> -->
+                        <!-- <h3>Submit Daily Report</h3>
+     -->
+                        <!-- Manual Input Section -->
+                        <div class="modal-body">
+                            
+                            <div class="manual-input-section">
+                                <h4>Manual Input</h4>
+                                <div class="form-group">
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-6">
+                                        <label for="report_cost">Cost</label>
+                                        <input type="text" id="report_cost" class="form-control"
+                                            placeholder="Enter today's cost">
+                                    </div>
+                                </div><br>
+                                <div class="row">
+                                    <div class="form-group col-3">
+                                        <input type="checkbox" id="pest_problem"> Pest Problem Exists
+                                    </div>
+                                    <div class="form-group col-3">
+                                        <input type="checkbox" id="pest_resolved"> Pest Problem Resolved
+                                    </div>
+                                </div><br><br>
+        
+                            </div>
+        
+                            <!-- Image Upload Section -->
+                            <div class="image-upload-section">
+                                <h4>Upload Image</h4>
+                                <div id="drop-area" class="drop-area">
+                                    <p>Drag and drop a crop image here, or <span id="browseFile">browse</span></p>
+                                    <input type="file" id="crop_image" class="form-control" style="display: none;">
+                                </div>
+                                <div id="image-preview" class="image-preview"></div>
+                            </div>
+        
+                            <!-- Submit Button -->
+                            <button class="agri-button-main" id="submit-report-btn">Submit Report</button>
+    
+                            
+                        </div>
+
+
+                    </div>
+                </div>
+  
+            </div>
+
+
+
+            <script>
+                function sendChatMessage() {
+                    const chatInput = document.getElementById('chat-input').value;
+                    const chatBox = document.getElementById('chat-box');
+
+                    chatBox.innerHTML += `<p><strong>You:</strong> ${chatInput}</p>`;
+                    const responses = [
+                        "You should consider using a nitrogen-based fertilizer to promote leaf growth for your crop.",
+                        "Make sure to water your crops early in the morning to prevent excess evaporation.",
+                        "Pest control is crucial! Use organic pesticides to avoid harming the soil.",
+                        "Regularly rotate your crops to maintain soil fertility and prevent nutrient depletion.",
+                        "Using phosphorus-rich fertilizer can help promote strong root growth.",
+                        "Consider adding organic matter like compost to improve soil structure and fertility.",
+                        "Ensure your crops are receiving sufficient sunlight for optimal growth.",
+                        "Regular weeding is important to ensure that crops are not competing for nutrients.",
+                        "If you're experiencing slow crop growth, potassium-rich fertilizers can help improve overall crop health.",
+                        "Ensure proper drainage in your field to prevent root diseases caused by excess water."
+                    ];
+                    let response = "Here's some advice for your crop!";
+                    if (chatInput.includes("fertilizer")) {
+                        response = "Using nitrogen-rich fertilizer will help with leafy growth, while phosphorus will strengthen root systems.";
+                    } else if (chatInput.includes("water") || chatInput.includes("irrigation")) {
+                        response = "Water your crops early in the day to reduce evaporation and prevent fungal growth.";
+                    } else if (chatInput.includes("pest")) {
+                        response = "Consider using natural pest repellents like neem oil to keep pests away without harming your crops.";
+                    } else if (chatInput.includes("soil")) {
+                        response = "Test your soil regularly for nutrient levels. Adding organic compost can significantly improve soil quality.";
+                    } else if (chatInput.includes("growth")) {
+                        response = "Regular monitoring of your crop's growth stages is important. Apply potassium-based fertilizers to boost overall health.";
+                    } else {
+                        // Random response for general queries
+                        response = responses[Math.floor(Math.random() * responses.length)];
+                    }
+
+                    setTimeout(() => {
+                        chatBox.innerHTML += `<p><strong>AI:</strong> ${response}</p>`;
+                        chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to bottom
+                    }, 1000);
+
+                    document.getElementById('chat-input').value = '';
+                }
+                document.getElementById('send-chat-btn').addEventListener('click', () => {
+                    sendChatMessage();
+                });
+                document.getElementById('chat-input').addEventListener('keypress', function (event) {
+                    if (event.key === 'Enter') {
+                        event.preventDefault();  // Prevent the form from submitting if inside one
+                        sendChatMessage();
+                    }
+                });
+
+                // Initial dummy data for crop diary
+                const cropDiaryData = [
+                    { id: 1, code: '001', type: 'Crop Update', date: '2024-03-15', description: 'Fertilizer applied' },
+                    { id: 2, code: '002', type: 'Crop Problem', date: '2024-03-17', description: 'Pest attack observed' },
+                    { id: 3, code: '003', type: 'Crop Performance', date: '2024-03-20', description: 'Growth rate is normal' }
+                ];
+
+                // Create Tabulator table
+                const table = new Tabulator("#crop-diary-table", {
+                    data: cropDiaryData, // Set the initial data
+                    layout: "fitColumns", // Fit columns to width of the table
+                    pagination: "local", // Enable pagination
+                    paginationSize: 10, // Number of rows per page
+                    movableColumns: true, // Allow columns to be moved
+                    initialSort: [ // Sort by the submitted date initially
+                        { column: "date", dir: "desc" }
+                    ],
+                    columns: [ // Define table columns
+                        { title: "Data Type", field: "type", editor: "input" },
+                        { title: "Submitted Date", field: "date", sorter: "date", editor: "input" },
+                        { title: "Description", field: "description", editor: "textarea" }
+                    ]
+                });
+
+
+
+
+                const cropPerformanceData = [
+                    { id: 1, year: '2023', month: '3', amount: '90', profit: "70%" },
+                    { id: 1, year: '2023', month: '10', amount: '80', profit: "60%" },
+                    { id: 2, year: '2024', month: '3', amount: '85', profit: "55%" }
+                ];
+
+                // Create Tabulator table
+                const table2 = new Tabulator("#crop-performance-table", {
+                    data: cropPerformanceData, // Set the initial data
+                    layout: "fitColumns", // Fit columns to width of the table
+                    pagination: "local", // Enable pagination
+                    paginationSize: 10, // Number of rows per page
+                    movableColumns: true, // Allow columns to be moved
+
+                    columns: [ // Define table columns
+                        { title: "Year", field: "year", width: 100 },
+                        { title: "Harvested Month", field: "month", width: 190 },
+                        { title: "Yeild Amount", field: "amount" },
+                        { title: "Profit Margin", field: "profit" }
+                    ]
+                });
+
+
+
+                // Add Row button logic
+                document.getElementById("add-row").addEventListener("click", function () {
+                    table.addRow({ id: cropDiaryData.length + 1, code: '', type: '', date: '', description: '' });
+                });
+
+
+                // Function to generate random IoT data
+                function generateIoTData() {
+                    return {
+                        temperature: (Math.random() * 2 + 20).toFixed(2),  // Random temp between 20°C and 30°C
+                        humidity: (Math.random() * 2 + 50).toFixed(2),     // Random humidity between 40% and 60%
+                        soilMoisture: (Math.random() * 2 + 40).toFixed(2)  // Random soil moisture between 30% and 40%
+                    };
+                }
+
+                // Function to update the dashboard with new IoT data
+                function updateIoTData() {
+                    const data = generateIoTData();
+                    document.getElementById('temperature').innerText = `Temperature: ${data.temperature} °C`;
+                    // document.getElementById('humidity').innerText = `Humidity: ${data.humidity} %`;
+                    // document.getElementById('soil-moisture').innerText = `Soil Moisture: ${data.soilMoisture} %`;
+                    document.getElementById('humidity-bar').style.width = `${data.humidity}%`;
+                    document.getElementById('soil-moisture-bar').style.width = `${data.soilMoisture}%`;
+                }
+
+                // Update the data every 2 seconds
+                setInterval(updateIoTData, 3000);
+
+
+
+                const editButton = document.getElementById('edit_btn');
+                const updateButton = document.getElementById('update_btn');
+                const inputFields = document.querySelectorAll('.form-control');  // Select all form inputs
+
+                // Function to toggle between view and edit mode
+                function toggleEditMode(isEditMode) {
+                    inputFields.forEach(input => {
+                        input.disabled = !isEditMode;  // Enable or disable inputs based on mode
+                    });
+                    editButton.style.display = isEditMode ? 'none' : 'inline-block';
+                    updateButton.style.display = isEditMode ? 'inline-block' : 'none';
+                }
+
+                // Initial view mode
+                toggleEditMode(false);
+
+                // Handle edit button click
+                editButton.addEventListener('click', () => {
+                    toggleEditMode(true);  // Enable edit mode
+                });
+
+                // Handle update button click
+                updateButton.addEventListener('click', () => {
+                    const loadingIcon = document.getElementById('loading-icon');
+                    const grayOverlay = document.getElementById('gray-overlay');
+
+                    loadingIcon.style.display = "block"
+                    grayOverlay.style.opacity = 1;
+                    // Perform the update operation here (e.g., send data to server)
+                    setTimeout(() => {
+                        loadingIcon.style.display = "none";
+                        grayOverlay.style.opacity = 0;
+
+                        // Switch back to view mode after update
+                        toggleEditMode(false);
+
+                    }, 2500)
+                });
+
+
+            </script>
+
+            <script>
+
+                // Get the modal
+                const modal = document.getElementById("daily-report-modal");
+
+                // Get the button that opens the modal
+                const btn = document.getElementById("daily-report-btn");
+
+                // Get the <span> element that closes the modal
+                const span = document.getElementsByClassName("close")[0];
+
+                // Handle modal open and close
+                btn.onclick = function () {
+                    modal.style.display = "block";
+                }
+                // span.onclick = function () {
+                //     modal.style.display = "none";
+                // }
+                window.onclick = function (event) {
+                    if (event.target == modal) {
+                        modal.style.display = "none";
+                    }
+                }
+
+                // Drag and Drop Logic
+                const dropArea = document.getElementById('drop-area');
+                const fileInput = document.getElementById('crop_image');
+                const imagePreview = document.getElementById('image-preview');
+
+                dropArea.addEventListener('dragover', (event) => {
+                    event.preventDefault();
+                    dropArea.style.backgroundColor = '#e6f7e6';  // Change color on drag over
+                });
+
+                dropArea.addEventListener('dragleave', () => {
+                    dropArea.style.backgroundColor = '#f0f8f0';  // Reset background on drag leave
+                });
+
+                dropArea.addEventListener('drop', (event) => {
+                    event.preventDefault();
+                    dropArea.style.backgroundColor = '#f0f8f0';
+                    const files = event.dataTransfer.files;
+                    handleFileUpload(files[0]);
+                });
+
+                document.getElementById('browseFile').addEventListener('click', () => {
+                    fileInput.click();
+                });
+
+                fileInput.addEventListener('change', () => {
+                    const files = fileInput.files;
+                    handleFileUpload(files[0]);
+                });
+
+                function handleFileUpload(file) {
+                    if (file && file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            imagePreview.innerHTML = `<img src="${e.target.result}" alt="Uploaded Image">`;
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        imagePreview.innerHTML = `<p style="color: red;">Please upload a valid image file.</p>`;
+                    }
+                }
+
+                // Handle form submission for the daily report
+                document.getElementById('submit-report-btn').addEventListener('click', () => {
+                    const cost = document.getElementById('report_cost').value;
+                    document.getElementById('total_cost').value = "$"+(5000 +parseInt(cost));
+                    // const fertilizerUsed = document.getElementById('fertilizer_used').value;
+                    const pestProblem = document.getElementById('pest_problem').checked;
+                    const pestResolved = document.getElementById('pest_resolved').checked;
+                    const cropImage = document.getElementById('crop_image').files[0];
+
+                    console.log({
+                        cost,
+                        // fertilizerUsed,
+                        pestProblem,
+                        pestResolved,
+                        cropImage
+                    });
+
+                    // Close the modal after submission
+                    modal.style.display = "none";
+                });
+
+
+
+            </script>
+
+
+<script>
+    // Chatbox for modal logic
+    document.getElementById('general-modal-send-chat-btn').addEventListener('click', () => {
+        const chatInput = document.getElementById('modal-chat-input').value;
+        const chatBox = document.getElementById('modal-chat-box');
+
+        // Display user input in chatbox
+        chatBox.innerHTML += `<p><strong>You:</strong> ${chatInput}</p>`;
+
+        // Process the input to check if it contains 'set reminder'
+        const reminderPattern = /set reminder for (.+)/i;  // Regex to capture the reminder text
+        const reminderMatch = chatInput.match(reminderPattern);
+
+        if (reminderMatch) {
+            const reminderText = reminderMatch[1];  // Extract the 'something' part
+
+            // // Add reminder to dashboard
+            // addReminderToDashboard(reminderText);
+
+            setTimeout(() => {
+                chatBox.innerHTML += `<p><strong>AI:</strong> Reminder set for "${reminderText}"!</p>`;
+                chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to bottom
+            }, 1000);
+
+        } else {
+            // Default AI response if no 'set reminder' is found
+            setTimeout(() => {
+                chatBox.innerHTML += `<p><strong>AI:</strong> Here's some advice for your crop!</p>`;
+                chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to bottom
+            }, 1000);
+        }
+
+        // Clear input
+        document.getElementById('modal-chat-input').value = '';
+    });
+
+</script>
+        </div>

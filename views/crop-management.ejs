@@ -1,0 +1,109 @@
+<%- include('header') %>
+<%- include('menu') %>
+
+<div class="content-container" style="margin-left: 60px; padding: 20px;">
+    <div class="container table-container">
+        <h3 class="">Crop Management</h3><br><br>
+        <div class="row">
+            <div class="toolbar">
+                <button class ="agri-button-main" id="add-row"><i class="fas fa-plus"></i> &nbsp;Add</button>
+                <button class ="agri-button-main" id="delete-row"><i class="fas fa-minus"></i> &nbsp;Delete</button>
+            </div>
+        </div><br>
+
+        <div id="crop-table"></div>
+    </div>
+
+    <script>
+        const crops = <%- JSON.stringify(crops) %>;
+
+        const tableData = [
+    {id: 1, crop_cd:"001", crop_name: "Wheat", planted_on: "2024-03-01", harvest_due: "2024-10-22", status: "Good", estimate_amount:"100kg", profit_margin:"65%", action_num: 3},
+    {id: 2, crop_cd:"002", crop_name: "Corn", planted_on: "2024-05-12", harvest_due: "2024-11-30", status: "Average", estimate_amount:"130kg", profit_margin:"70%" , action_num: 2},
+    {id: 3, crop_cd:"003", crop_name: "Tomato", planted_on: "2024-06-15", harvest_due: "2024-09-25", status: "Very Good", estimate_amount:"90kg", profit_margin:"65%", action_num: 1},
+    {id: 4, crop_cd:"004", crop_name: "Watermelon", planted_on: "2024-07-15", harvest_due: "2024-10-25", status: "Very Good", estimate_amount: "60kg", profit_margin:"60%", action_num: 0},
+    {id: 5, crop_cd:"005", crop_name: "Green Onion", planted_on: "2024-06-15", harvest_due: "2024-09-25", status: "Low", estimate_amount:"60kg", profit_margin:"20%", action_num: 6}
+];
+
+function statusFormatter(cell, formatterParams) {
+    let value = cell.getValue();
+    
+    switch (value) {
+        case 'Very Good':
+            return `<span style="color: #4CAF50; font-weight: bold;">${value}</span>`; // Light green for Very Good
+        case 'Good':
+            return `<span style="color: #388E3C;">${value}</span>`; // Darker green for Good
+        case 'Average':
+            return `<span style="color: #FFC107;">${value}</span>`; // Yellow-orange for Average
+        case 'Low':
+            return `<span style="color: #D32F2F; font-weight: bold; background-color: #FFCDD2; padding: 2px 5px; border-radius: 3px;">${value}</span>`; // Red for Low with light red background
+        default:
+            return value; // fallback for other statuses
+    }
+}
+
+        const table = new Tabulator("#crop-table", {
+            data: tableData, // Load the dummy data
+    layout: "fitColumns", // Fit columns to width
+    columns: [
+    {formatter: "rowSelection", titleFormatter: "rowSelection", width: 40, align: "center", headerSort: false, cellClick: function(e, cell){
+            // Toggle row selection when checkbox is clicked
+            cell.getRow().toggleSelect();
+        }},
+        {title: "Crop Code", field: "crop_cd", width: 140}, 
+        {title: "Crop Name", field: "crop_name", width: 170}, 
+        {title: "Planted On", field: "planted_on", width: 150}, 
+        {title: "Harvest Due", field: "harvest_due", width: 150},
+        {title: "Status", field: "status", width: 110, formatter:statusFormatter },
+        {title: "Estimation", field: "estimate_amount", width: 170},
+        {title: "Profit Margin", field: "profit_margin", width: 170},
+        {title: "Incomplete Action", field: "action_num", width: 193},
+    ],
+    rowClick: function (e, row) {
+                // On row click, redirect to Crop Detail page (for now just a console log)
+                const cropId = row.getData().id;
+                console.log("Row clicked! Redirecting to crop detail for ID:", cropId);
+                window.location.href = `/crop-management/${cropId}`; // Redirect to detail page
+            }
+});
+
+
+// Function to open the crop detail screen
+function openCropDetail(cropData) {
+    if (cropData && cropData.id) {
+        // If the crop has an ID, navigate to the detail screen for that crop
+        window.location.href = `/crop-management/${cropData.id}`;
+    } else {
+        // If there is no ID, navigate to the new crop creation screen
+        window.location.href = '/crop-management/new';
+    }
+}
+
+
+// Add Row
+document.getElementById("add-row").addEventListener("click", () => {
+
+    openCropDetail(); 
+});
+
+// Delete Selected Rows
+document.getElementById("delete-row").addEventListener("click", () => {
+    let selectedRows = table.getSelectedRows(); // Get selected rows
+    if (selectedRows.length > 0) {
+        selectedRows.forEach(row => row.delete()); // Delete selected rows
+    } else {
+        alert("No rows selected!");
+    }
+});
+
+// Update Data (prints to console)
+document.getElementById("update-row").addEventListener("click", () => {
+    let updatedData = table.getData(); // Get updated data from the table
+    console.log("Updated Data:", updatedData); // Print to console (no backend interaction)
+});
+
+
+    </script>
+</div>
+
+<%- include('footer') %>

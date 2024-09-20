@@ -1,0 +1,203 @@
+<%- include('header') %>
+<%- include('menu') %>
+
+<div class="content-container dashboard-container" style="margin-left: 60px; padding: 20px;">
+    <div class="row">
+        <div class="col-2">
+            <div class="sidebar">
+                <div class="stat-card">Total Area<br><span>15 ha</span></div>
+                <div class="stat-card">Total Crop<br><span>09 ha</span></div>
+                <div class="stat-card">Total Yield<br><span>102 ton</span></div>
+                <div class="stat-card">Total Revenue<br><span>$ 80,000.00</span></div>
+                <div class="stat-card">Crop Status<br><span>Good</span></div>
+            </div>
+        </div>
+        <div class="col-5 center-content">
+            <div class="row">
+                <div class="charts">
+                    <div class="">
+                        <h4>Overview</h4>
+                        <canvas id="overviewChart" height="90px"></canvas>
+                    </div>
+            
+                </div>
+            </div><br>
+            <div class="row">
+                <div class="charts">
+    
+                    <div class="yield-chart">
+                        <h4>Crop Yield</h4>
+                        <canvas id="yieldChart" height="90px"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="weather">
+                    <h4>Weather</h4>
+                    <div class="weather-day"  data-day="today" onclick='showRecommendation("Today", "The AI assistant has detected that rain is expected in your region over the next few days. To optimize crop health, it recommends adjusting irrigation schedules to avoid overwatering. Additionally, it is a good time to apply organic fertilizers, as the rain will help with nutrient absorption. Be sure to monitor soil drainage to prevent waterlogging, which could harm crop roots.")'>
+                        <i class="fas fa-cloud-rain"></i> Today, Sep 06 - 76mm, W 3km/h
+                    </div>
+                    <div class="weather-day"  data-day="Saturday" onclick="showRecommendation('Saturday', 'A storm is forecasted to hit your area soon. The AI assistant advises you to secure any loose equipment and crop covers to prevent storm damage. It also suggests applying protective treatments to vulnerable crops and reviewing drainage systems to handle the expected heavy rainfall. After the storm, it is crucial to inspect for crop damage and address any issues immediately.')">
+                        <i class="fas fa-cloud"></i> Sat, Sep 07 - 20mm, W 7km/h
+                    </div>
+                    <div class="weather-day"  data-day="Sunday" onclick="showRecommendation('Sunday', 'With a sunny spell ahead, the AI assistant suggests increasing irrigation to meet the higher water demands of your crops. This is also an excellent time to promote growth by applying nitrogen-rich fertilizers. You should inspect your crops for early signs of heat stress and ensure proper shading for delicate plants during peak sunlight hours.')">
+                        <i class="fas fa-sun"></i> Sun, Sep 08 - 10mm, W 5km/h
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-5 right-sidebar">
+            <h4>Task</h4>
+
+            <div class="task-list" style="margin-bottom: 40px;">
+                <div class="task-item">
+                    <i class="fas fa-vial"></i> Soil Test <span>5 plots - 5ha</span> <span>07/09/2024</span>
+                </div>
+                <div class="task-item">
+                    <i class="fas fa-seedling"></i> Plant Crop <span>10 plots - 7ha</span> <span>10/09/2024</span>
+                </div>
+                <div class="task-item">
+                    <i class="fas fa-tractor"></i> Harvest <span>5 plots - 5ha</span> <span>20/09/2024</span>
+                </div>
+                <div class="task-item">
+                    <i class="fas fa-bug"></i> Pest Control <span>2 plots - 2ha</span> <span>22/09/2024</span>
+                </div>
+            </div><br>
+        
+            <div class="reminder">
+                <h4>Reminder</h4>
+                <div class="reminder-container">
+                    <!-- Reminder buttons with icons -->
+                    <button class="reminder-button urgent"><i class="fas fa-exclamation-triangle"></i>&ensp; Damage check</button>
+                    <button class="reminder-button"><i class="fas fa-calendar-alt"></i>&ensp; Update Harvest schedule</button>
+                    <button class="reminder-button"><i class="fas fa-cloud-sun"></i>&ensp; Storm preparation</button>
+                    <button class="reminder-button"><i class="fas fa-seedling"></i>&ensp; Update Crop status</button>
+                    <button class="reminder-button"><i class="fas fa-tools"></i>&ensp; Equipment check</button>
+                    <!-- <button class="reminder-button"><i class="fas fa-thermometer-half"></i>&ensp; Check irrigation system</button> -->
+                </div>
+            </div><br>
+            <div id="recommendation" >
+                <h3>AI Recommendation</h3>
+                <div class="recommendation-section">
+                    <p id="recommendation-text">Click on a day to see recommendations.</p>
+
+                </div>
+            </div>
+        
+        </div>
+    </div>
+
+
+
+
+
+</div>
+
+<script>
+    const overviewCtx = document.getElementById('overviewChart').getContext('2d');
+    const overviewChart = new Chart(overviewCtx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            datasets: [{
+                label: 'Expected',
+                data: [2, 3, 4, 5, 4, 4, 5, 6, 4, 6, 5, 6],
+                borderColor: '#1f6348e8',
+                fill: false
+            }, {
+                label: 'Actual',
+                data: [2, 3, 3, 4, 4, 5, 5, 5, 4, null, null, null],
+                borderColor: '#4d8a9a',
+                fill: false
+            }]
+        }
+    });
+
+    const yieldCtx = document.getElementById('yieldChart').getContext('2d');
+    const yieldChart = new Chart(yieldCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Tomato', 'Potato', 'Corn', 'Apple'],
+            datasets: [{
+                label: 'Expected',
+                data: [5, 4, 3, 4],
+                backgroundColor: '#1f6348e8'
+            }, {
+                label: 'Actual',
+                data: [4, 3, 2, 3],
+                backgroundColor: '#4d8a9a'
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+
+    // Function to display recommendation based on the weather day clicked
+function showRecommendation(day, recommendation) {
+    // Find the recommendation text element
+    const recommendationText = document.getElementById("recommendation-text");
+
+    // Update the content with the selected day's recommendation
+    recommendationText.innerHTML = `<strong>${day}:</strong> ${recommendation}`;
+}
+</script>
+
+
+
+<script>
+    // Chatbox for modal logic
+    document.getElementById('general-modal-send-chat-btn').addEventListener('click', () => {
+        const chatInput = document.getElementById('modal-chat-input').value;
+        const chatBox = document.getElementById('modal-chat-box');
+
+        // Display user input in chatbox
+        chatBox.innerHTML += `<p><strong>You:</strong> ${chatInput}</p>`;
+
+        // Process the input to check if it contains 'set reminder'
+        const reminderPattern = /set reminder for (.+)/i;  // Regex to capture the reminder text
+        const reminderMatch = chatInput.match(reminderPattern);
+
+        if (reminderMatch) {
+            const reminderText = reminderMatch[1];  // Extract the 'something' part
+
+            // Add reminder to dashboard
+            addReminderToDashboard(reminderText);
+
+            setTimeout(() => {
+                chatBox.innerHTML += `<p><strong>AI:</strong> Reminder set for "${reminderText}"!</p>`;
+                chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to bottom
+            }, 1000);
+
+        } else {
+            // Default AI response if no 'set reminder' is found
+            setTimeout(() => {
+                chatBox.innerHTML += `<p><strong>AI:</strong> Here's some advice for your crop!</p>`;
+                chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to bottom
+            }, 1000);
+        }
+
+        // Clear input
+        document.getElementById('modal-chat-input').value = '';
+    });
+
+    // Function to dynamically add reminder to dashboard
+    function addReminderToDashboard(reminderText) {
+        const reminderContainer = document.querySelector('.reminder-container');  // Find reminder section
+        const reminderItem = document.createElement('button');
+        reminderItem.className = "reminder-button";  // Assuming 'agri-button-main' class for buttons
+        reminderItem.innerHTML = '<i class="fas fa-thermometer-half"></i>&ensp;' + reminderText;
+
+
+        reminderContainer.appendChild(reminderItem);  // Add reminder button to the reminder section
+    }
+</script>
+
+<%- include('footer') %>
